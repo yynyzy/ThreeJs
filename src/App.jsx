@@ -2,6 +2,8 @@ import { createElement, useEffect, useState } from 'react';
 import './App.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+// 导入 GUI
+import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 import { render } from 'react-dom';
 
 function App() {
@@ -29,7 +31,9 @@ function App() {
     // 创建网格
     const cube = new THREE.Mesh(geometry, material);
     // 创建父网格
-    const parentCube = new THREE.Mesh(geometry, parentMaterial)
+    const parentCube = new THREE.Mesh(geometry, parentMaterial);
+    // 设置父元素材质为线框模式
+    // parentMaterial.wireframe = true;
     parentCube.add(cube);
 
     // 设置相机位置
@@ -67,7 +71,7 @@ function App() {
     orbitControls.autoRotate = true;
 
     function animate () {
-      orbitControls.update();
+      // orbitControls.update();s
       requestAnimationFrame(animate);
       // cube.rotation.x += 0.01;
       // cube.rotation.y += 0.01;
@@ -83,30 +87,67 @@ function App() {
       camera.updateProjectionMatrix;
     })
 
-      const button = document.createElement('button');
-      button.innerHTML = '点击全屏'
-      button.style.position = 'absolute';
-      button.style.left = '10px';
-      button.style.top = '10px';
-      button.style.zIndex = '999';
-      button.onclick = function () {
-        renderer.domElement.requestFullScreen();
-        console.log('全屏');
-      };
-      document.body.appendChild(button);
+      // const button = document.createElement('button');
+      // button.innerHTML = '点击全屏'
+      // button.style.position = 'absolute';
+      // button.style.left = '10px';
+      // button.style.top = '10px';
+      // button.style.zIndex = '999';
+      // button.onclick = function () {
+      //   renderer.domElement.requestFullScreen();
+      //   console.log('全屏');
+      // };
+      // document.body.appendChild(button);
 
-      const button1 = document.createElement('button');
-      button1.innerHTML = '退出全屏'
-      button1.style.position = 'absolute';
-      button1.style.left = '100px';
-      button1.style.top = '10px';
-      button1.style.zIndex = '999';
-      button1.onclick = () => {
-        document.exitFullscreen();
-        console.log('退出全屏');
-      };
-      document.body.appendChild(button1);
+      // const button1 = document.createElement('button');
+      // button1.innerHTML = '退出全屏'
+      // button1.style.position = 'absolute';
+      // button1.style.left = '100px';
+      // button1.style.top = '10px';
+      // button1.style.zIndex = '999';
+      // button1.onclick = () => {
+      //   document.exitFullscreen();
+      //   console.log('退出全屏');
+      // };
+      // document.body.appendChild(button1);
 
+      // 初始化 GUI
+      const gui = new GUI();
+
+    // 事件k控制
+      const EventObj = {
+        FullScreen: ()=>{
+            renderer.domElement.requestFullScreen();
+            console.log('全屏');
+        },
+        exitFullscreen: ()=>{
+          document.exitFullscreen();
+          console.log('退出全屏');
+      }
+      }
+      gui.add(EventObj, 'FullScreen').name('全屏');
+      gui.add(EventObj, 'exitFullscreen').name('退出全屏');
+
+      let folder =gui.addFolder('立方体位置');
+
+      // 物体位置
+      folder.add(cube.position, 'x').min(1).max(10).step(1).name('物体在x轴上的位置')
+        .onChange((val) => console.log('x轴上变化'))
+        .onFinishChange(() => console.log(cube.position.x));
+      folder.add(cube.position, 'y').min(1).max(10).step(1).name('物体在y轴上的位置');
+      folder.add(cube.position, 'z').min(1).max(10).step(1).name('物体在z轴上的位置');
+
+      // 控制父元素线框模式
+      gui.add(parentMaterial, 'wireframe').name('线框模式')
+
+
+      const colors = {
+        cubeColor: '#ff0000'
+      }
+      // 物体颜色
+      gui.addColor(colors, 'cubeColor').name('物体颜色').onChange((c) => {
+        cube.material.color.set(c);
+      })
   }, []);
 
 
